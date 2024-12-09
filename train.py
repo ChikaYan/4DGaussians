@@ -256,6 +256,8 @@ def scene_reconstruction(dataset, opt, hyper, pipe, testing_iterations, saving_i
                     # total_images.append(to8b(temp_image).transpose(1,2,0))
             timer.start()
             # Densification
+            # MAX_N_GS = 360000
+            MAX_N_GS = 600000
             if iteration < opt.densify_until_iter :
                 # Keep track of max radii in image-space for pruning
                 gaussians.max_radii2D[visibility_filter] = torch.max(gaussians.max_radii2D[visibility_filter], radii[visibility_filter])
@@ -267,7 +269,7 @@ def scene_reconstruction(dataset, opt, hyper, pipe, testing_iterations, saving_i
                 else:    
                     opacity_threshold = opt.opacity_threshold_fine_init - iteration*(opt.opacity_threshold_fine_init - opt.opacity_threshold_fine_after)/(opt.densify_until_iter)  
                     densify_threshold = opt.densify_grad_threshold_fine_init - iteration*(opt.densify_grad_threshold_fine_init - opt.densify_grad_threshold_after)/(opt.densify_until_iter )  
-                if  iteration > opt.densify_from_iter and iteration % opt.densification_interval == 0 and gaussians.get_xyz.shape[0]<360000:
+                if  iteration > opt.densify_from_iter and iteration % opt.densification_interval == 0 and gaussians.get_xyz.shape[0]<MAX_N_GS:
                     size_threshold = 20 if iteration > opt.opacity_reset_interval else None
                     
                     gaussians.densify(densify_threshold, opacity_threshold, scene.cameras_extent, size_threshold, 5, 5, scene.model_path, iteration, stage)
@@ -277,7 +279,7 @@ def scene_reconstruction(dataset, opt, hyper, pipe, testing_iterations, saving_i
                     gaussians.prune(densify_threshold, opacity_threshold, scene.cameras_extent, size_threshold)
                     
                 # if iteration > opt.densify_from_iter and iteration % opt.densification_interval == 0 :
-                if iteration % opt.densification_interval == 0 and gaussians.get_xyz.shape[0]<360000 and opt.add_point:
+                if iteration % opt.densification_interval == 0 and gaussians.get_xyz.shape[0]<MAX_N_GS and opt.add_point:
                     gaussians.grow(5,5,scene.model_path,iteration,stage)
                     # torch.cuda.empty_cache()
                 if iteration % opt.opacity_reset_interval == 0:

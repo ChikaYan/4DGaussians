@@ -19,4 +19,4 @@ for folder_name in sorted(os.listdir(dir1)):
             dst_path = os.path.join(images_path, f"image{i}.jpg")
             shutil.copyfile(src_path, dst_path) 
 
-print("End！")
+print("End!")

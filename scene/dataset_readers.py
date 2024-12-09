@@ -193,7 +193,8 @@ def readColmapSceneInfo(path, images, eval, llffhold=8):
                            train_cameras=train_cam_infos,
                            test_cameras=test_cam_infos,
                            video_cameras=train_cam_infos,
-                           maxtime=0,
+                        #    maxtime=0,
+                           maxtime=len(cam_infos),
                            nerf_normalization=nerf_normalization,
                            ply_path=ply_path)
     return scene_info
@@ -466,7 +467,14 @@ def readdynerfInfo(datadir,use_bg_points,eval):
     nerf_normalization = getNerfppNorm(train_cam_infos)
 
     # xyz = np.load
-    pcd = fetchPly(ply_path)
+    # pcd = fetchPly(ply_path)
+
+    xyz, rgb, _ = read_points3D_binary(os.path.join(datadir, "sparse/0/images.bin"))
+
+    positions = xyz
+    colors = rgb
+    pcd = BasicPointCloud(points=positions, colors=colors)
+
     print("origin points,",pcd.points.shape[0])
     
     print("after points,",pcd.points.shape[0])

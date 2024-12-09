@@ -56,7 +56,8 @@ class multipleview_dataset(Dataset):
         return image_paths, image_poses,image_times
     
     def get_video_cam_infos(self,datadir):
-        poses_arr = np.load(os.path.join(datadir, "poses_bounds_multipleview.npy"))
+        # poses_arr = np.load(os.path.join(datadir, "poses_bounds_multipleview.npy"))
+        poses_arr = np.load(os.path.join(datadir, "poses_bounds.npy"))
         poses = poses_arr[:, :-2].reshape([-1, 3, 5])  # (N_cams, 3, 5)
         near_fars = poses_arr[:, -2:]
         poses = np.concatenate([poses[..., 1:2], -poses[..., :1], poses[..., 2:4]], -1)

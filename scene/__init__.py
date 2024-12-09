@@ -42,6 +42,10 @@ class Scene:
         self.train_cameras = {}
         self.test_cameras = {}
         self.video_cameras = {}
+
+
+        # scene_info = sceneLoadTypeCallbacks["dynerf"](args.source_path, args.white_background, args.eval)
+        # dataset_type="dynerf"
         if os.path.exists(os.path.join(args.source_path, "sparse")):
             scene_info = sceneLoadTypeCallbacks["Colmap"](args.source_path, args.images, args.eval, args.llffhold)
             dataset_type="colmap"

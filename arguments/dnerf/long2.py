@@ -18,12 +18,12 @@ OptimizationParams = dict(
     deformation_lr_delay_mult = 0.01,
     grid_lr_init = 0.0016,
     grid_lr_final = 0.000016,
-    iterations = 60000,
+    iterations = 100000,
     pruning_interval = 8000,
-    percent_dense = 0.01,
+    percent_dense = 0.0,
     render_process=False,
     # no_do=False,
-    # no_dshs=False
+    no_dshs=True,
     
     opacity_reset_interval=3000
 
