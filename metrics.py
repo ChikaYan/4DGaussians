@@ -21,6 +21,8 @@ from tqdm import tqdm
 from utils.image_utils import psnr
 from argparse import ArgumentParser
 from pytorch_msssim import ms_ssim
+import wandb
+
 def readImages(renders_dir, gt_dir):
     renders = []
     gts = []
@@ -107,6 +109,24 @@ def evaluate(model_paths):
                 json.dump(full_dict[scene_dir], fp, indent=True)
             with open(scene_dir + "/per_view.json", 'w') as fp:
                 json.dump(per_view_dict[scene_dir], fp, indent=True)
+
+            wandb_id_path = Path(scene_dir) / 'wandb_id.txt'
+            if wandb_id_path.exists():
+                with wandb_id_path.open('r') as f:
+                    wandb_id = f.read()
+                wandb.init(
+                    project="phenoeye_static", 
+                    id=wandb_id,
+                    resume='must',
+                    )
+                wandb.log(
+                    {"test/SSIM": torch.tensor(ssims).mean().item(),
+                    "test/PSNR": torch.tensor(psnrs).mean().item(),
+                    "test/LPIPS-vgg": torch.tensor(lpipss).mean().item(),
+                    "test/LPIPS-alex": torch.tensor(lpipsa).mean().item(),
+                    "test/MS-SSIM": torch.tensor(ms_ssims).mean().item(),
+                    "test/D-SSIM": torch.tensor(Dssims).mean().item()}
+                )
         except Exception as e:
             
             print("Unable to compute metrics for model", scene_dir)

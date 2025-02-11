@@ -1,6 +1,6 @@
 
-SCENE=cabbage3
-CONFIG=long2
+CONFIG=long3
+SCENE=$1
 
 python train.py -s /home/tw554/4DGaussians/data/china/$SCENE --port 6018 --expname "$SCENE/$CONFIG" --configs arguments/dnerf/$CONFIG.py 
 

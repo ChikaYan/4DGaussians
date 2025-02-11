@@ -30,6 +30,8 @@ import lpips
 from utils.scene_utils import render_training_image
 from time import time
 import copy
+import wandb
+from pathlib import Path
 
 to8b = lambda x : (255*np.clip(x.cpu().numpy(),0,1)).astype(np.uint8)
 
@@ -299,6 +301,28 @@ def scene_reconstruction(dataset, opt, hyper, pipe, testing_iterations, saving_i
 def training(dataset, hyper, opt, pipe, testing_iterations, saving_iterations, checkpoint_iterations, checkpoint, debug_from, expname):
     # first_iter = 0
     tb_writer = prepare_output_and_logger(expname)
+
+    # import pdb; pdb.set_trace()
+
+    conf = {}
+
+    conf.update(dataset.__dict__)
+    conf.update(hyper.__dict__)
+    conf.update(opt.__dict__)
+
+    wandb.init(
+        project="phenoeye_static", 
+        name=expname, 
+        group=Path(dataset.source_path).name, 
+        config=conf, 
+        )
+    
+    # write wandb id for eval logging
+    wandb_id_path = Path("output") / expname / 'wandb_id.txt'
+    wandb_id_path.parent.mkdir(exist_ok=True, parents=True)
+    with wandb_id_path.open('w') as f:
+        f.write(wandb.run.id)
+
     gaussians = GaussianModel(dataset.sh_degree, hyper)
     dataset.model_path = args.model_path
     timer = Timer()
@@ -326,13 +350,13 @@ def prepare_output_and_logger(expname):
     with open(os.path.join(args.model_path, "cfg_args"), 'w') as cfg_log_f:
         cfg_log_f.write(str(Namespace(**vars(args))))
 
-    # Create Tensorboard writer
-    tb_writer = None
-    if TENSORBOARD_FOUND:
-        tb_writer = SummaryWriter(args.model_path)
-    else:
-        print("Tensorboard not available: not logging progress")
-    return tb_writer
+    # # Create Tensorboard writer
+    # tb_writer = None
+    # if TENSORBOARD_FOUND:
+    #     tb_writer = SummaryWriter(args.model_path)
+    # else:
+    #     print("Tensorboard not available: not logging progress")
+    # return tb_writer
 
 def training_report(tb_writer, iteration, Ll1, loss, l1_loss, elapsed, testing_iterations, scene : Scene, renderFunc, renderArgs, stage, dataset_type):
     if tb_writer:

@@ -1,6 +1,6 @@
 
 REGION=china
-VID_NAME=cabbage3
+VID_NAME=$1
 
 DATA_DIR=./data/$REGION/$VID_NAME
 
